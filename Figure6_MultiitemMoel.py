@@ -1032,21 +1032,20 @@ def evaluate_wm(across_factor, spike_monitor_excit,synapse_monitor_excit, depres
 #                                    RUN SIMULATIONS                                                #
 #####################################################################################################
 
-# sims = 1001
-# across_factor = 0.002
-# simulations = np.ones((sims))*across_factor
-# with mp.Pool(numcores) as p:
-#     print('Starting '+str(sims)+' simulations')
-#     t0 = time.time()
-#     results = p.map(run_simulation, simulations)
-#     t1 = time.time()
-#     print('Used time: ' + str(t1 - t0))
-#     time.sleep(0.1) # otherwise all trials try to write at the same time
-
-#(0.003)
-#
-for simus in range(1):
+sims = 1001
+across_factor = 0.002
+simulations = np.ones((sims))*across_factor
+with mp.Pool(numcores) as p:
+    print('Starting '+str(sims)+' simulations')
     t0 = time.time()
-    run_simulation(0.002)
+    results = p.map(run_simulation, simulations)
     t1 = time.time()
-    print('Used time: '+str(t1-t0))
+    print('Used time: ' + str(t1 - t0))
+    time.sleep(0.1) # otherwise all trials try to write at the same time
+
+
+# for simus in range(1):
+#     t0 = time.time()
+#     run_simulation(0.002)
+#     t1 = time.time()
+#     print('Used time: '+str(t1-t0))

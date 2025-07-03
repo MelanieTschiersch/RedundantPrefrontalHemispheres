@@ -970,22 +970,22 @@ def evaluate_wm(across_factor, spike_monitor_excit,synapse_monitor_excit, depres
 #                                    RUN SIMULATIONS                                                #
 #####################################################################################################
 
-# sims = 60001
-# possible_factors = np.arange(0., 0.012, 0.002)
-# possible_factors = np.append(possible_factors, -0.01)
-# across_factors = np.round(np.random.choice(possible_factors, sims), 3)
-# with mp.Pool(numcores) as p:
-#     print('Starting '+str(sims)+' simulations')
-#     t0 = time.time()
-#     results = p.map(run_simulation, across_factors)
-#     t1 = time.time()
-#     print('Used time: ' + str(t1 - t0))
-#     time.sleep(0.1) # otherwise all trials try to write at the same time
+sims = 60001
+possible_factors = np.arange(0., 0.012, 0.002)
+possible_factors = np.append(possible_factors, -0.01)
+across_factors = np.round(np.random.choice(possible_factors, sims), 3)
+with mp.Pool(numcores) as p:
+    print('Starting '+str(sims)+' simulations')
+    t0 = time.time()
+    results = p.map(run_simulation, across_factors)
+    t1 = time.time()
+    print('Used time: ' + str(t1 - t0))
+    time.sleep(0.1) # otherwise all trials try to write at the same time
 
 #(0.003)
 
-for simus in range(1):
-    t0 = time.time()
-    run_simulation(0.002)
-    t1 = time.time()
-    print('Used time: '+str(t1-t0))
+# for simus in range(1):
+#     t0 = time.time()
+#     run_simulation(0.002)
+#     t1 = time.time()
+#     print('Used time: '+str(t1-t0))
