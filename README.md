@@ -4,7 +4,6 @@
 This repository contains the code used to generate the main figures and supplementary analyses presented in the preprint. The code includes simulations, data analysis, and plotting routines.
 
 🔒 Note: The dataset used in the study is not yet publicly available, but will be shared via this repository as soon as possible.
-To run the notebooks, it is recommended to install the environment contained in the environment.yml file with conda. The same environment can be used for models and data analysis.
 
 ### Getting started:
 To reproduce the results, we recommend using the environment provided in environment.yml. You can create the environment using:
@@ -15,8 +14,9 @@ conda activate <env-name>
 The environment is compatible with both, data analysis and model simulations.
 
 ### Repository structure:
-- **Jupyter notebooks**: Notebooks named FigureX.ipynb replicate specific figures (i.e. Figure1.ipynb replicates Figure 1 of the main manuscript). These notebooks create figures directly, using preprocessed data and simulation results.
-- **Python scripts**: Scripts are prefixed by matching figure number. Scripts contain more computationally expensive preprocessing steps or simulations
+- **Folders**: Folders contain the available code for each figure.
+- **Jupyter notebooks**: Notebooks replicate panels of specific figures. The notebooks create figures directly, using preprocessed data and simulation results.
+- **Python scripts**: Scripts contain more computationally expensive preprocessing steps or simulations.
 
 ### Notes
 While the notebooks should run as-is (once the data is available), some files assume a specific folder structure and data location, which will be clarified once the dataset is released.
