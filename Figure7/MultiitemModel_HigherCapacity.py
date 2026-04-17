@@ -53,17 +53,12 @@ import multiprocessing as mp
 from model_fcts import *
 from random import randint
 
-import seaborn as sns
-#%matplotlib inline
-#%config InlineBackend.figure_format = 'svg'
-import matplotlib.pylab as pylab
-
 #clear_cache('cython')
 
-import seaborn as sns
+#import seaborn as sns
 #%matplotlib inline
 #%config InlineBackend.figure_format = 'svg'
-import matplotlib.pylab as pylab
+#import matplotlib.pylab as pylab
 
 import matplotlib.pyplot as plt
 plt.style.use("nature_neurosci.mplstyle")
@@ -84,7 +79,7 @@ colors = {
 prefs.codegen.target = 'cython'
 
 
-filename     = "TwoAreaMultiitem4targetsRandom30_2stableplay"
+filename     = "TwoAreaMultiitemModel_HigherCapacity_bug"
 
 start_time = time.time()
 numcores   = np.max([int(mp.cpu_count()/2)-2, 1])
@@ -600,6 +595,8 @@ def simulate_wm(
 
     @network_operation(dt=1 * ms)
     def stimulate_network(t):
+        excit_pop.I_stim[:] = 0 * namp
+        excit_pop2.I_stim[:] = 0 * namp
         if t >= t_stimulus1_start and t < t_stimulus1_start + t_stimulus_duration:  # Stimulus1
             xxx = np.linspace(-np.pi, np.pi, len(stimuli1_target_idx[0]))
             ipsi_percentage = 0.7
@@ -664,7 +661,7 @@ def simulate_wm(
     stim1D_load = int((load - 3) >= 1)  # whether a fourth stimulus is applied
     stim1all_load = int((load - 7) >= 1)  # whether a fourth stimulus is applied
     stimuli1 = generate_stimuli(n_stim=load, min_sep_deg=30)
-    stimuli1 = [10, 70, 180, 290]#[350, 70, 180, 260]#,
+    #stimuli1 = [10, 70, 180, 290]#[350, 70, 180, 260]#,
    # stimuli1 = [70, 180]
 
     distr_location = 0  # randint(0,359)
@@ -773,76 +770,76 @@ def evaluate_wm(across_factor, spike_monitor_excit,synapse_monitor_excit, depres
     ######################################################################################################
     #                                                 PLOTS                                              #
     ######################################################################################################
-    x = np.linspace(-(sim_time - 250 * ms), 250 * ms, len(t))
+    # x = np.linspace(-(sim_time - 250 * ms), 250 * ms, len(t))
+    # # #
     # #
+    # # # create stimulus plot
+    # xx = np.arange(0, sim_time, 0.1)
+    # timeIdx_stim = np.where(xx > 0.5)[0]
+    # stim = np.zeros((xx.shape))
+    # stim[int(t_stimulus1_start / (100 * ms)):int(t_stimulus1_end / (100 * ms))] = stimulus_strength
+    # stim[
+    #     int(t_response_end / (100 * ms)):int(
+    #         (t_response_end + t_stimulus_duration) / (100 * ms))] = -2 * stimulus_strength
+    # # stim[int(t_reig_start / (100 * ms)):int(t_reig_end / (100 * ms))] = reig_strength
+    # # stim[int(t_reig_end / (100 * ms) + 2):int(t_reig_end / (100 * ms) + 6)] = -stimulus_strength
+    # # stim[int(t_stimulus2_start / (100 * ms)):int(t_stimulus2_end / (100 * ms))] = stimulus_strength
     #
-    # # create stimulus plot
-    xx = np.arange(0, sim_time, 0.1)
-    timeIdx_stim = np.where(xx > 0.5)[0]
-    stim = np.zeros((xx.shape))
-    stim[int(t_stimulus1_start / (100 * ms)):int(t_stimulus1_end / (100 * ms))] = stimulus_strength
-    stim[
-        int(t_response_end / (100 * ms)):int(
-            (t_response_end + t_stimulus_duration) / (100 * ms))] = -2 * stimulus_strength
-    # stim[int(t_reig_start / (100 * ms)):int(t_reig_end / (100 * ms))] = reig_strength
-    # stim[int(t_reig_end / (100 * ms) + 2):int(t_reig_end / (100 * ms) + 6)] = -stimulus_strength
-    # stim[int(t_stimulus2_start / (100 * ms)):int(t_stimulus2_end / (100 * ms))] = stimulus_strength
-
-
-    f, ax = plt.subplots(len(areas), 1, figsize=(2., 1.9), sharex=True, \
-                         gridspec_kw={'height_ratios': [0.5, 0.5]})
-    sns.despine()
-    for ar, area in enumerate(list(areas)):
-        time_idx = np.where(monitor['t'][area] > 500 * ms)[0]
-        # im = ax[ar + 1].imshow(np.append(monitor['stp'][area][int(3*N_e/4):], monitor['stp'][area][:int(3*N_e/4)], axis=0),\
-        #                       aspect='auto', origin='lower', \
-        #                    extent=[0, (sim_time / ms) / 1000, 0, N_e], cmap='YlOrRd')  # cividis
-        ax[ar].plot(monitor['t'][area][time_idx] - t_stimulus1_start, (monitor['i'][area][time_idx] + N_e / 4) % N_e,
-                    'k.', \
-                    marker='.', markerfacecolor='k',
-                    ms=0.05, linestyle='', rasterized=True)  # t
-        # ax[ar].plot(-0.2, (stim1A_location + 90) % 360 * N_e / 360, 'kv', ms=3)  # t
-        # ax[ar].plot(-0.2, (stim1B_location + 90) % 360 * N_e / 360, 'kD', ms=3)  # t
-        # if load == 3:
-        #     ax[ar].plot(-0.2, (stim1C_location + 90) % 360 * N_e / 360, 'ks', ms=3)  # t
-        ax[ar].fill_between([0, t_stimulus1_end - t_stimulus1_start], [0, 0], [N_e, N_e], color='grey', alpha=.3)
-        # ax[ar + 1].fill_between([t_stimulus2_start, t_stimulus2_end], [0, 0], [N_e, N_e], color='grey', alpha=.3)
-        # ax[ar + 1].set_ylim([0, N_e])
-        # ax[ar + 1].set_ylabel('RF ($^\circ$)')
-        if ar == 0:
-            ax[ar].set_ylabel('A$_{Left}$')
-        else:
-            ax[ar].set_ylabel('A$_{Right}$')
-        ax[ar].set_yticks([N_e / 4, N_e / 2, 3 * N_e / 4, 0])
-        ax[ar].set_yticklabels([0, 90, 180, 270])
-        ax[ar].axhline(N_e / 2, color='k', dashes=[1, 1], alpha=0.5)
-        ax[ar].yaxis.set_ticks_position('left')
-        #
-        # ax[ar + 1].set_ylim([N_e / 2 - N_e / 4, N_e / 2 + N_e / 4])
-    # if REACT1 == True:
-    #     ax[0].fill_between([t_reig_start, t_reig_end], [0, 0], [N_e, N_e], color='yellow', alpha=.3)
-    # if REACT2 == True:
-    #     ax[1].fill_between([t_reig_start, t_reig_end], [0, 0], [N_e, N_e], color='yellow', alpha=.3)
-    ax[1].xaxis.set_ticks_position('bottom')
-    ax[1].set_xlabel('time (s)')
-    plt.subplots_adjust(wspace=0, hspace=0.25)
-    ax[0].set_xticks([0, 1, 2, 3])
-    ax[1].set_xticks([0, 1, 2, 3])
-    ax[0].set_xlim([-t_stimulus1_start, 3500*ms])
-    ax[1].set_xlim([-t_stimulus1_start, 3500*ms])
-    #ax[0].set_ylim([-5, N_e+5])
-    #ax[1].set_ylim([-5, N_e+5])
-    plt.tight_layout()
-    plt.savefig('./Trial_4Multiitems4distributed_2stable.svg')
-    # if (HEMI_A == HEMI_B) & (load == 2):
-    #     plt.savefig('./Trial_4Multiitem_Same2items.svg')
-    # elif (HEMI_A != HEMI_B) & (load == 2):
-    #     plt.savefig('./Trial_4Multiitem_Opposite2items.svg')
-    # elif (HEMI_A == HEMI_B) & (load == 4):
-    #     plt.savefig('./Trial_4Multiitem_Same4items.svg')
-    # elif (HEMI_A != HEMI_B) & (load == 4):
-    #     plt.savefig('./Trial_4Multiitem_Opposite4items.svg')
-    plt.show()
+    #
+    # f, ax = plt.subplots(len(areas), 1, figsize=(2., 1.9), sharex=True, \
+    #                      gridspec_kw={'height_ratios': [0.5, 0.5]})
+    # sns.despine()
+    # for ar, area in enumerate(list(areas)):
+    #     time_idx = np.where(monitor['t'][area] > 500 * ms)[0]
+    #     # im = ax[ar + 1].imshow(np.append(monitor['stp'][area][int(3*N_e/4):], monitor['stp'][area][:int(3*N_e/4)], axis=0),\
+    #     #                       aspect='auto', origin='lower', \
+    #     #                    extent=[0, (sim_time / ms) / 1000, 0, N_e], cmap='YlOrRd')  # cividis
+    #     ax[ar].plot(monitor['t'][area][time_idx] - t_stimulus1_start, (monitor['i'][area][time_idx] + N_e / 4) % N_e,
+    #                 'k.', \
+    #                 marker='.', markerfacecolor='k',
+    #                 ms=0.05, linestyle='', rasterized=True)  # t
+    #     # ax[ar].plot(-0.2, (stim1A_location + 90) % 360 * N_e / 360, 'kv', ms=3)  # t
+    #     # ax[ar].plot(-0.2, (stim1B_location + 90) % 360 * N_e / 360, 'kD', ms=3)  # t
+    #     # if load == 3:
+    #     #     ax[ar].plot(-0.2, (stim1C_location + 90) % 360 * N_e / 360, 'ks', ms=3)  # t
+    #     ax[ar].fill_between([0, t_stimulus1_end - t_stimulus1_start], [0, 0], [N_e, N_e], color='grey', alpha=.3)
+    #     # ax[ar + 1].fill_between([t_stimulus2_start, t_stimulus2_end], [0, 0], [N_e, N_e], color='grey', alpha=.3)
+    #     # ax[ar + 1].set_ylim([0, N_e])
+    #     # ax[ar + 1].set_ylabel('RF ($^\circ$)')
+    #     if ar == 0:
+    #         ax[ar].set_ylabel('A$_{Left}$')
+    #     else:
+    #         ax[ar].set_ylabel('A$_{Right}$')
+    #     ax[ar].set_yticks([N_e / 4, N_e / 2, 3 * N_e / 4, 0])
+    #     ax[ar].set_yticklabels([0, 90, 180, 270])
+    #     ax[ar].axhline(N_e / 2, color='k', dashes=[1, 1], alpha=0.5)
+    #     ax[ar].yaxis.set_ticks_position('left')
+    #     #
+    #     # ax[ar + 1].set_ylim([N_e / 2 - N_e / 4, N_e / 2 + N_e / 4])
+    # # if REACT1 == True:
+    # #     ax[0].fill_between([t_reig_start, t_reig_end], [0, 0], [N_e, N_e], color='yellow', alpha=.3)
+    # # if REACT2 == True:
+    # #     ax[1].fill_between([t_reig_start, t_reig_end], [0, 0], [N_e, N_e], color='yellow', alpha=.3)
+    # ax[1].xaxis.set_ticks_position('bottom')
+    # ax[1].set_xlabel('time (s)')
+    # plt.subplots_adjust(wspace=0, hspace=0.25)
+    # ax[0].set_xticks([0, 1, 2, 3])
+    # ax[1].set_xticks([0, 1, 2, 3])
+    # ax[0].set_xlim([-t_stimulus1_start, 3500*ms])
+    # ax[1].set_xlim([-t_stimulus1_start, 3500*ms])
+    # #ax[0].set_ylim([-5, N_e+5])
+    # #ax[1].set_ylim([-5, N_e+5])
+    # plt.tight_layout()
+    # plt.savefig('./Trial_4Multiitems4distributed_2stable.svg')
+    # # if (HEMI_A == HEMI_B) & (load == 2):
+    # #     plt.savefig('./Trial_4Multiitem_Same2items.svg')
+    # # elif (HEMI_A != HEMI_B) & (load == 2):
+    # #     plt.savefig('./Trial_4Multiitem_Opposite2items.svg')
+    # # elif (HEMI_A == HEMI_B) & (load == 4):
+    # #     plt.savefig('./Trial_4Multiitem_Same4items.svg')
+    # # elif (HEMI_A != HEMI_B) & (load == 4):
+    # #     plt.savefig('./Trial_4Multiitem_Opposite4items.svg')
+    # plt.show()
 
     # # #
     # # # plot facil*depression
@@ -1016,20 +1013,20 @@ def evaluate_wm(across_factor, spike_monitor_excit,synapse_monitor_excit, depres
 #                                    RUN SIMULATIONS                                                #
 #####################################################################################################
 #
-# sims = 6001
-# across_factor = 0.002
-# simulations = np.ones((sims))*across_factor
-# with mp.Pool(numcores) as p:
-#     print('Starting '+str(sims)+' simulations')
-#     t0 = time.time()
-#     results = p.map(run_simulation, simulations)
-#     t1 = time.time()
-#     print('Used time: ' + str(t1 - t0))
-#     time.sleep(0.1) # otherwise all trials try to write at the same time
+sims = 2001
+across_factor = 0.002
+simulations = np.ones((sims))*across_factor
+with mp.Pool(numcores) as p:
+    print('Starting '+str(sims)+' simulations')
+    t0 = time.time()
+    results = p.map(run_simulation, simulations)
+    t1 = time.time()
+    print('Used time: ' + str(t1 - t0))
+    time.sleep(0.1) # otherwise all trials try to write at the same time
 
 # #
-for simus in range(1):
-    t0 = time.time()
-    run_simulation(0.002)
-    t1 = time.time()
-    print('Used time: '+str(t1-t0))
+# for simus in range(1):
+#     t0 = time.time()
+#     run_simulation(0.002)
+#     t1 = time.time()
+#     print('Used time: '+str(t1-t0))
